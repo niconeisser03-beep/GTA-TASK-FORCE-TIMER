@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GTA Taskforce Timer</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700;900&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    overflow: hidden;
+}
+
+.timer-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* GTA TASKFORCE */
+.title {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 58px;
+    font-weight: 900;
+    font-style: italic;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+
+    -webkit-text-stroke: 3px black;
+
+    text-shadow:
+        4px 4px 0 #000,
+        6px 6px 0 rgba(0,0,0,0.6);
+
+    margin-bottom: 5px;
+}
+
+/* TIMER */
+#timer {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 105px;
+    font-weight: 900;
+    font-style: italic;
+    color: white;
+
+    -webkit-text-stroke: 4px black;
+
+    text-shadow:
+        5px 5px 0 #000,
+        8px 8px 0 rgba(0,0,0,0.6);
+
+    letter-spacing: 2px;
+}
+
+/* BLINKEN BEI 00:00 */
+.finished {
+    animation: blink 0.7s infinite alternate;
+}
+
+@keyframes blink {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0.25;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="timer-container">
+
+    <div class="title">
+        GTA TASKFORCE
+    </div>
+
+    <div id="timer">
+        1:20:00
+    </div>
+
+</div>
+
+<script>
+
+const START_TIME = (1 * 60 * 60) + (20 * 60);
+
+let totalSeconds = START_TIME;
+let timerRunning = false;
+let interval = null;
+
+const timerElement = document.getElementById("timer");
+
+
+function formatTime(seconds) {
+
+    const hours = Math.floor(seconds / 3600);
+
+    const minutes = Math.floor((seconds % 3600) / 60);
+
+    const secs = seconds % 60;
+
+    return (
+        hours +
+        ":" +
+        String(minutes).padStart(2, "0") +
+        ":" +
+        String(secs).padStart(2, "0")
+    );
+}
+
+
+function updateTimer() {
+
+    timerElement.textContent = formatTime(totalSeconds);
+
+    if (totalSeconds <= 0) {
+
+        clearInterval(interval);
+
+        timerRunning = false;
+
+        timerElement.textContent = "0:00:00";
+
+        timerElement.classList.add("finished");
+
+        return;
+    }
+
+    totalSeconds--;
+}
+
+
+function startTimer() {
+
+    if (timerRunning) return;
+
+    timerRunning = true;
+
+    timerElement.classList.remove("finished");
+
+    updateTimer();
+
+    interval = setInterval(updateTimer, 1000);
+}
+
+
+function pauseTimer() {
+
+    clearInterval(interval);
+
+    timerRunning = false;
+}
+
+
+function resetTimer() {
+
+    clearInterval(interval);
+
+    totalSeconds = START_TIME;
+
+    timerRunning = false;
+
+    timerElement.classList.remove("finished");
+
+    timerElement.textContent = formatTime(totalSeconds);
+}
+
+
+/*
+================================
+TASTENSTEUERUNG
+================================
+
+SPACE = Start / Pause
+R     = Reset
+*/
+
+document.addEventListener("keydown", function(event) {
+
+    if (event.code === "Space") {
+
+        event.preventDefault();
+
+        if (timerRunning) {
+
+            pauseTimer();
+
+        } else {
+
+            startTimer();
+
+        }
+    }
+
+
+    if (event.key.toLowerCase() === "r") {
+
+        resetTimer();
+
+    }
+
+});
+
+
+/* Anfangsanzeige */
+resetTimer();
+
+</script>
+
+</body>
+</html>
